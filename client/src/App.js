@@ -131,7 +131,15 @@ class App extends Component {
         
       </form>
 
-      
+      <div class='barChart'>
+        <div class='bar'>{barChart(data)}</div>
+        <div class='bar'>
+          <form action = 'http://localhost:5000/express_backend' method='POST'>
+          <input type='text' name='Enter' maxLength = "256" placeholder="Rate this chart from 1-10"/>
+          <input type='submit' value='Enter'/>
+          </form>
+        </div>
+      </div>
 
       <div class='pieChart'>
         <div class='pie'>{pieChart(data)}</div>
