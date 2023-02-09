@@ -2,6 +2,8 @@ import React, { Component, useState, useEffect  } from 'react';
 //import logo from './logo.svg';
 import './App.css';
 import {PieChart, Pie, Tooltip, BarChart, CartesianGrid, XAxis, YAxis, Legend, Bar, RadialBarChart, RadialBar} from "recharts";
+import * as Survey from "survey-react";
+import axios from "axios";
 
 class App extends Component {
   constructor(props){
@@ -14,10 +16,8 @@ class App extends Component {
   }
 
   sayHello(){
-    alert("Answers Submitted");
-    var x = document.nameForm;
-    var y = document.pieForm;
-    y.submit();
+    var y = document.barChart;
+    console.log("Triggered me");
   }
 
   state = {
@@ -42,6 +42,27 @@ class App extends Component {
   };
 
   render() {
+    var myJson =  {"logoPosition":"right","pages":[{"name":"page1","elements":[{"type":"rating","name":"Bar Chart","title":"The Bar Chart displays the data clearly.","rateValues":[{"value":"5","text":"Strongly Agree"},{"value":"4","text":"Agree"},{"value":"3","text":"Neutral"},{"value":"2 ","text":"Disagree"},{"value":"1","text":"Strongly Disagree"}]},{"type":"rating","name":"Pie Chart","title":"This Pie Chart displays the data clearly.","rateValues":[{"value":"5","text":"Strongly Agree"},{"value":"4","text":"Agree"},{"value":"3","text":"Neutral"},{"value":"2 ","text":"Disagree"},{"value":"1","text":"Strongly Disagree"}]}]}]};
+    var nameJson = {
+      elements: [{
+        name: "FirstName",
+        title: "Please Enter Your Name to Get Started:",
+        type: "text"
+      }]
+    };
+
+    const sendDataToServer = (survey) => {
+        //send Ajax request to your web server
+        axios.post('http://localhost:5000/express_backend', {
+          data: survey.data,
+          name: localStorage.getItem('name')
+        })
+    };
+
+    const sendNameToStorage = (survey) => {
+      localStorage.setItem('name', survey.data.FirstName)
+    };
+
     const data = [
       {
         name: "Soil Level", 
@@ -128,38 +149,16 @@ class App extends Component {
       <h1>Farming Data Visualization</h1>
       <form name = "nameForm" action = 'http://localhost:5000/express_backend' method='POST'>
         <input type='text' name='Enter' maxLength = "256" placeholder="Enter Your Name"/>
-        
       </form>
+      <div><Survey.Survey json={nameJson} onComplete={sendNameToStorage} completedHtmlOnCondition={"Continue"} /></div>
 
       <div class='barChart'>
         <div class='bar'>{barChart(data)}</div>
-        <div class='bar'>
-          <form action = 'http://localhost:5000/express_backend' method='POST'>
-          <input type='text' name='Enter' maxLength = "256" placeholder="Rate this chart from 1-10"/>
-          <input type='submit' value='Enter'/>
-          </form>
-        </div>
       </div>
-
       <div class='pieChart'>
         <div class='pie'>{pieChart(data)}</div>
-        <div class='pie'>
-          <form name = "pieForm" action = 'http://localhost:5000/express_backend' method='POST'>
-          <input type='text' name='Enter' maxLength = "256" placeholder="Rate this chart from 1-10"/>
-          </form>
-        </div>
       </div>
-
-      <div class='barChart'>
-        <div class='bar'>{barChart(data)}</div>
-        <div class='bar'>
-          <form action = 'http://localhost:5000/express_backend' method='POST'>
-          <input type='text' name='Enter' maxLength = "256" placeholder="Rate this chart from 1-10"/>
-          <input type='submit' value='Enter'/>
-          </form>
-        </div>
-      </div>
-      <button onClick={this.sayHello}>click here</button>
+      <div><Survey.Survey json={myJson} onComplete={sendDataToServer} /></div>
     </div>
     );
   }
