@@ -1,9 +1,11 @@
 import React, { Component, useState, useEffect  } from 'react';
 //import logo from './logo.svg';
 import './App.css';
-import {PieChart, Pie, Tooltip, BarChart, CartesianGrid, XAxis, YAxis, Legend, Bar, RadialBarChart, RadialBar} from "recharts";
 import * as Survey from "survey-react";
 import axios from "axios";
+import { nameJsonSurvey } from './SurveyJsons/NameJson';
+import { surveyOneJson } from './SurveyJsons/SurveyOne';
+import { pieChart, barChart } from './Charts/ChartFuncs';
 
 class App extends Component {
   constructor(props){
@@ -12,12 +14,6 @@ class App extends Component {
       name: "",
       pie: ""
     }
-    this.sayHello = this.sayHello.bind(this);
-  }
-
-  sayHello(){
-    var y = document.barChart;
-    console.log("Triggered me");
   }
 
   state = {
@@ -42,14 +38,9 @@ class App extends Component {
   };
 
   render() {
-    var myJson =  {"logoPosition":"right","pages":[{"name":"page1","elements":[{"type":"rating","name":"Bar Chart","title":"The Bar Chart displays the data clearly.","rateValues":[{"value":"5","text":"Strongly Agree"},{"value":"4","text":"Agree"},{"value":"3","text":"Neutral"},{"value":"2 ","text":"Disagree"},{"value":"1","text":"Strongly Disagree"}]},{"type":"rating","name":"Pie Chart","title":"This Pie Chart displays the data clearly.","rateValues":[{"value":"5","text":"Strongly Agree"},{"value":"4","text":"Agree"},{"value":"3","text":"Neutral"},{"value":"2 ","text":"Disagree"},{"value":"1","text":"Strongly Disagree"}]}]}]};
-    var nameJson = {
-      elements: [{
-        name: "FirstName",
-        title: "Please Enter Your Name to Get Started:",
-        type: "text"
-      }]
-    };
+    var surveyJson = surveyOneJson;
+    var nameJson = nameJsonSurvey;
+    let pieBool = true;
 
     const sendDataToServer = (survey) => {
         //send Ajax request to your web server
@@ -80,85 +71,20 @@ class App extends Component {
         Measured: 250
       },
     ];
-  
-    const singleData = [
-      {
-      name: "Nitrogen", 
-      Measured: 250
-    },
-    ];
-
-    function pieChart(testData)
-    {
-      return(
-        <PieChart width = {700} height = {350}>
-        <Pie
-          dataKey = "Expected"
-          isAnimationActive = {false}
-          data = {testData}
-          cx = {200}
-          cy = {200}
-          outerRadius = {80}
-          fill = "#57c0e8"
-          label
-        />
-        <text
-          x='28%'
-          y='10%'
-          style={{ fontSize: 24, fontWeight: 'bold', fill: '#000000' }}
-          width={200}
-          scaleToFit={true}
-          textAnchor='middle'
-          verticalAnchor='middle'
-        >
-          PieChart
-        </text>
-        <Tooltip />
-      </PieChart>
-      );
-    }
-
-    function barChart(testData)
-    {
-      return(
-        <BarChart width={730} height={250} data={testData} margin={{ top: 50, right: 5, bottom: 5, left: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="name" />
-        <YAxis />
-        <text
-          x='28%'
-          y='10%'
-          style={{ fontSize: 24, fontWeight: 'bold', fill: '#000000' }}
-          width={200}
-          scaleToFit={true}
-          textAnchor='middle'
-          verticalAnchor='middle'
-        >
-          BarChart
-        </text>
-        <Tooltip />
-        <Legend />
-        <Bar dataKey="Expected" fill="#8884d8" />
-        <Bar dataKey="Measured" fill="#82ca9d" />
-      </BarChart>
-      );
-    }
 
     return (
       <div className="App">
       <h1>Farming Data Visualization</h1>
-      <form name = "nameForm" action = 'http://localhost:5000/express_backend' method='POST'>
-        <input type='text' name='Enter' maxLength = "256" placeholder="Enter Your Name"/>
-      </form>
-      <div><Survey.Survey json={nameJson} onComplete={sendNameToStorage} completedHtmlOnCondition={"Continue"} /></div>
+      <div><Survey.Survey json={nameJson} onComplete={sendNameToStorage}/></div>
 
       <div class='barChart'>
         <div class='bar'>{barChart(data)}</div>
       </div>
       <div class='pieChart'>
-        <div class='pie'>{pieChart(data)}</div>
+        <div class='pie'>{pieBool ? pieChart(data) : null}</div>
       </div>
-      <div><Survey.Survey json={myJson} onComplete={sendDataToServer} /></div>
+
+      <div><Survey.Survey json={surveyJson} onComplete={sendDataToServer} /></div>
     </div>
     );
   }
