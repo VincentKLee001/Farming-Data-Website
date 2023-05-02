@@ -14,10 +14,11 @@ class App extends Component {
       name: "",
       pie: ""
     }
-  }
+  };
 
   state = {
-    data: null
+    data: null,
+    myData: []
   };
 
   componentDidMount() {
@@ -25,11 +26,24 @@ class App extends Component {
     this.callBackendAPI()
       .then(res => this.setState({ data: res.express }))
       .catch(err => console.log(err));
+
+      this.getData();
   }
+
+  getData = () => {
+    axios.get('/express_backend')
+    .then((response) => {
+      const myGetData = response.data;
+      this.setState({myData: myGetData});
+      console.log("Data Received");
+    })
+  };
+
     // Fetches our GET route from the Express server. (Note the route we are fetching matches the GET route from server.js
   callBackendAPI = async () => {
     const response = await fetch('/express_backend');
     const body = await response.json();
+    console.log(response);
 
     if (response.status !== 200) {
       throw Error(body.message) 
@@ -41,6 +55,7 @@ class App extends Component {
     var surveyJson = surveyOneJson;
     var nameJson = nameJsonSurvey;
     let pieBool = true;
+    
 
     const sendDataToServer = (survey) => {
         //send Ajax request to your web server
@@ -53,6 +68,7 @@ class App extends Component {
     const sendNameToStorage = (survey) => {
       localStorage.setItem('name', survey.data.FirstName)
     };
+
 
     const data = [
       {
